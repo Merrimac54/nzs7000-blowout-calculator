@@ -1,0 +1,1174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NZS 7000 Conductor Blowout Calculator | kirstymerriman.com</title>
+    <meta name="description" content="Free community screening tool for in-fill property developers to calculate conductor blowout compliance using AS/NZS 7000:2016 Appendix Q methodology.">
+    <meta name="keywords" content="conductor blowout, NZS 7000, NZECP34, overhead lines, property development, New Zealand, electrical clearance">
+    <meta name="author" content="Kirsty Merriman">
+    
+    <!-- Open Graph / Social Media -->
+    <meta property="og:title" content="NZS 7000 Conductor Blowout Calculator">
+    <meta property="og:description" content="Free community screening tool for in-fill property developers">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://kirstymerriman.com/blowout-calculator">
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- React -->
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    
+    <style>
+        *, *::before, *::after {
+            box-sizing: border-box;
+        }
+        
+        html, body {
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            font-family: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            color: #e8e8e8;
+            line-height: 1.5;
+        }
+        
+        /* Header Styles */
+        .header {
+            background: rgba(0,0,0,0.3);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            padding: 1.5rem 2rem;
+        }
+        
+        .header-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        
+        .header h1 {
+            margin: 0;
+            font-size: 1.75rem;
+            font-weight: 600;
+            letter-spacing: -0.02em;
+            color: #fff;
+        }
+        
+        .header-subtitle {
+            margin: 0.25rem 0 0 0;
+            font-size: 0.9rem;
+            color: rgba(255,255,255,0.6);
+        }
+        
+        .header-brand {
+            text-align: right;
+        }
+        
+        .header-brand-name {
+            font-size: 0.85rem;
+            color: #64b5f6;
+            font-weight: 500;
+        }
+        
+        .header-brand-tag {
+            font-size: 0.75rem;
+            color: rgba(255,255,255,0.5);
+        }
+        
+        /* Main Content */
+        .main {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        /* Info Banner */
+        .info-banner {
+            background: rgba(100, 181, 246, 0.1);
+            border: 1px solid rgba(100, 181, 246, 0.3);
+            border-radius: 8px;
+            padding: 1rem 1.25rem;
+            margin-bottom: 2rem;
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+        
+        .info-banner strong {
+            color: #64b5f6;
+        }
+        
+        .info-banner em {
+            color: rgba(255,255,255,0.7);
+        }
+        
+        /* Grid Layout */
+        .grid-2col {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 1.5rem;
+        }
+        
+        /* Section Styles */
+        .section {
+            background: rgba(255,255,255,0.05);
+            border-radius: 12px;
+            padding: 1.5rem;
+            border: 1px solid rgba(255,255,255,0.1);
+            overflow: visible;
+        }
+        
+        .section-full {
+            margin-top: 1.5rem;
+        }
+        
+        .section-title {
+            margin: 0 0 1.25rem 0;
+            font-size: 1rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            border-bottom: 2px solid currentColor;
+            padding-bottom: 0.5rem;
+        }
+        
+        .section-title.blue { color: #64b5f6; }
+        .section-title.green { color: #81c784; }
+        .section-title.orange { color: #ffb74d; }
+        .section-title.red { color: #e57373; }
+        .section-title.purple { color: #ce93d8; }
+        .section-title.grey { color: #90a4ae; }
+        
+        .section-subtitle {
+            margin: -1rem 0 1rem 0;
+            font-size: 0.85rem;
+            color: rgba(255,255,255,0.6);
+        }
+        
+        /* Form Elements */
+        .input-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.75rem;
+        }
+        
+        .input-group {
+            margin-bottom: 1rem;
+        }
+        
+        .input-group:last-child {
+            margin-bottom: 0;
+        }
+        
+        .input-label {
+            display: block;
+            font-size: 0.75rem;
+            color: rgba(255,255,255,0.7);
+            margin-bottom: 0.25rem;
+        }
+        
+        .input-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            max-width: 100%;
+        }
+        
+        .input-field {
+            flex: 1;
+            min-width: 0;
+            max-width: 100%;
+            padding: 0.5rem;
+            background: rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 6px;
+            color: #fff;
+            font-size: 0.9rem;
+            font-family: 'IBM Plex Mono', monospace;
+            box-sizing: border-box;
+        }
+        
+        .input-field:focus {
+            outline: none;
+            border-color: #64b5f6;
+        }
+        
+        .input-field.highlight {
+            background: rgba(255, 235, 59, 0.15);
+            border-color: rgba(255, 235, 59, 0.4);
+        }
+        
+        .input-field:disabled {
+            color: rgba(255,255,255,0.5);
+            cursor: not-allowed;
+        }
+        
+        .input-unit {
+            font-size: 0.8rem;
+            color: rgba(255,255,255,0.6);
+            min-width: 2.5rem;
+        }
+        
+        .input-hint {
+            font-size: 0.7rem;
+            color: rgba(255,255,255,0.4);
+            margin-top: 0.15rem;
+            display: block;
+        }
+        
+        select.input-field {
+            cursor: pointer;
+            -webkit-appearance: menulist;
+            appearance: menulist;
+            min-height: 2.5rem;
+        }
+        
+        select.input-field option {
+            background: #1a1a2e;
+            color: #fff;
+            padding: 0.5rem;
+        }
+        
+        select.input-field optgroup {
+            background: #16213e;
+            color: #64b5f6;
+            font-weight: 600;
+        }
+        
+        /* Result Rows */
+        .result-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.6rem;
+        }
+        
+        .result-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem 0.75rem;
+            background: rgba(0,0,0,0.15);
+            border-radius: 6px;
+            border-left: 3px solid transparent;
+        }
+        
+        .result-row.highlight {
+            background: rgba(129, 199, 132, 0.1);
+            border-left-color: #81c784;
+        }
+        
+        .result-label {
+            font-size: 0.85rem;
+        }
+        
+        .result-note {
+            display: block;
+            font-size: 0.7rem;
+            color: rgba(255,255,255,0.4);
+        }
+        
+        .result-value {
+            text-align: right;
+        }
+        
+        .result-value span {
+            font-family: 'IBM Plex Mono', monospace;
+            font-weight: 600;
+        }
+        
+        .result-row.highlight .result-value span {
+            color: #81c784;
+        }
+        
+        .result-value-unit {
+            font-size: 0.8rem;
+            color: rgba(255,255,255,0.6);
+            margin-left: 0.25rem;
+        }
+        
+        /* Tables */
+        .table-wrapper {
+            overflow-x: auto;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+        }
+        
+        thead tr {
+            border-bottom: 2px solid rgba(255,255,255,0.2);
+        }
+        
+        th {
+            text-align: left;
+            padding: 0.75rem 0.5rem;
+            color: rgba(255,255,255,0.8);
+            font-weight: 500;
+        }
+        
+        th.right {
+            text-align: right;
+        }
+        
+        th.center {
+            text-align: center;
+        }
+        
+        th.col-building {
+            text-align: right;
+            color: #81c784;
+            background: rgba(129, 199, 132, 0.1);
+        }
+        
+        th.col-midspan {
+            text-align: right;
+            color: #64b5f6;
+            background: rgba(100, 181, 246, 0.1);
+        }
+        
+        th.col-notes {
+            color: rgba(255,255,255,0.6);
+        }
+        
+        tbody tr {
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        td {
+            padding: 0.6rem 0.5rem;
+        }
+        
+        td.right {
+            text-align: right;
+            font-family: 'IBM Plex Mono', monospace;
+        }
+        
+        td.center {
+            text-align: center;
+        }
+        
+        td.col-building {
+            text-align: right;
+            font-family: 'IBM Plex Mono', monospace;
+            background: rgba(129, 199, 132, 0.05);
+        }
+        
+        td.col-midspan {
+            text-align: right;
+            font-family: 'IBM Plex Mono', monospace;
+            background: rgba(100, 181, 246, 0.05);
+        }
+        
+        td.col-notes {
+            color: rgba(255,255,255,0.6);
+            font-size: 0.8rem;
+        }
+        
+        tr.highlight {
+            background: rgba(255,255,255,0.03);
+        }
+        
+        tr.highlight td {
+            font-weight: 600;
+        }
+        
+        tr.clickable {
+            cursor: pointer;
+            transition: background 0.15s ease;
+        }
+        
+        tr.clickable:hover {
+            background: rgba(100, 181, 246, 0.1);
+        }
+        
+        tr.clickable.selected {
+            background: rgba(100, 181, 246, 0.1);
+        }
+        
+        tr.clickable.selected td:first-child {
+            color: #64b5f6;
+        }
+        
+        /* Status Badge */
+        .status-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        
+        .status-badge.compliant {
+            background: rgba(129, 199, 132, 0.2);
+            color: #81c784;
+            border: 1px solid rgba(129, 199, 132, 0.4);
+        }
+        
+        .status-badge.non-compliant {
+            background: rgba(229, 115, 115, 0.2);
+            color: #e57373;
+            border: 1px solid rgba(229, 115, 115, 0.4);
+        }
+        
+        .status-icon {
+            font-weight: normal;
+        }
+        
+        .status-icon.pass { color: #81c784; }
+        .status-icon.fail { color: #e57373; }
+        
+        /* Footer */
+        .footer {
+            margin-top: 2rem;
+            padding: 1.5rem;
+            background: rgba(0,0,0,0.2);
+            border-radius: 12px;
+            text-align: center;
+            font-size: 0.85rem;
+            color: rgba(255,255,255,0.6);
+        }
+        
+        .footer p {
+            margin: 0 0 0.5rem 0;
+        }
+        
+        .footer p:last-child {
+            margin-bottom: 0;
+        }
+        
+        .footer-small {
+            font-size: 0.75rem;
+        }
+        
+        .footer-muted {
+            color: rgba(255,255,255,0.4);
+        }
+        
+        .legend-green { color: #81c784; }
+        .legend-blue { color: #64b5f6; }
+        
+        /* Table helper text */
+        .table-help {
+            margin: 0.75rem 0 0 0;
+            font-size: 0.8rem;
+            color: rgba(255,255,255,0.5);
+        }
+        
+        /* Subsection styling */
+        .subsection {
+            background: rgba(0,0,0,0.15);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-top: 1rem;
+            overflow: visible;
+        }
+        
+        .subsection-title {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: rgba(255,255,255,0.8);
+            margin: 0 0 0.75rem 0;
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .header {
+                padding: 1rem;
+            }
+            
+            .header h1 {
+                font-size: 1.25rem;
+            }
+            
+            .header-inner {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .header-brand {
+                text-align: left;
+            }
+            
+            .main {
+                padding: 1rem;
+            }
+            
+            .grid-2col {
+                grid-template-columns: 1fr;
+            }
+            
+            .input-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .section {
+                padding: 1rem;
+            }
+            
+            table {
+                font-size: 0.8rem;
+            }
+            
+            th, td {
+                padding: 0.5rem 0.35rem;
+            }
+        }
+        
+        /* Print styles */
+        @media print {
+            body {
+                background: white;
+                color: black;
+            }
+            
+            .header {
+                background: none;
+                border-bottom: 2px solid #333;
+            }
+            
+            .section {
+                background: none;
+                border: 1px solid #ccc;
+                page-break-inside: avoid;
+            }
+            
+            .input-field {
+                border: 1px solid #999;
+                background: #f5f5f5;
+                color: black;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+    
+    <script type="text/babel">
+        // Common conductor reference data
+        const CONDUCTOR_TYPES = [
+            { name: '3w Cu 16 Bare', diameter: 5.1, weight: 1.77, use: '11kV HV overhead lines' },
+            { name: '7/1.75 Cu/HD', diameter: 5.25, weight: 1.77, use: 'LV service lines' },
+            { name: 'Cu 25 Bare', diameter: 6.3, weight: 2.55, use: '400V LV overhead lines' },
+            { name: 'Cu 35 Bare', diameter: 7.5, weight: 3.38, use: 'Larger LV overhead lines' },
+            { name: 'LV ABC 35', diameter: 11.5, weight: 1.35, use: 'LV insulated bundled cable' },
+            { name: 'AAC 49 PVC', diameter: 9.0, weight: 1.42, use: '240V lighting (insulated)' },
+            { name: 'Custom', diameter: 0, weight: 0, use: 'Enter custom values' }
+        ];
+
+        // Wind speed reference data
+        const WIND_SPEEDS = [
+            { label: '90 km/h (5yr)', pressure: 368 },
+            { label: '100 km/h (25yr)', pressure: 500 },
+            { label: '125 km/h (50yr)', pressure: 725 },
+            { label: '131 km/h (100yr)', pressure: 780 },
+            { label: '142 km/h (Vector)', pressure: 1000 }
+        ];
+
+        // NZECP34 Table 3 clearance requirements
+        // Column C: In any direction (other than vertically above) from normally accessible parts
+        const NZECP34_CLEARANCES = {
+            // Sub 1kV
+            'sub1kv_insulated': { clearance: 0.1, label: '≤1 kV Insulated', description: 'Low voltage insulated conductor' },
+            'sub1kv_bare_neutral': { clearance: 0.9, label: '≤1 kV Bare Neutral', description: 'Low voltage bare neutral' },
+            'sub1kv_bare_active': { clearance: 1.5, label: '≤1 kV Bare Active', description: 'Low voltage bare active' },
+            // 1kV to 33kV
+            '1to33kv_insulated_earthed': { clearance: 0.1, label: '1-33 kV Insulated (earthed screen)', description: 'HV insulated with earthed screen' },
+            '1to33kv_insulated_unearthed': { clearance: 1.5, label: '1-33 kV Insulated (no earthed screen)', description: 'HV insulated without earthed screen' },
+            '1to33kv_bare': { clearance: 2.1, label: '1-33 kV Bare/Covered', description: 'HV bare or covered conductor' },
+            // 33kV to 110kV
+            '33to110kv_bare': { clearance: 3.0, label: '33-110 kV Bare', description: 'EHV bare conductor' },
+            // 110kV to 220kV
+            '110to220kv_bare': { clearance: 4.5, label: '110-220 kV Bare', description: 'EHV bare conductor' },
+            // Above 220kV
+            'above220kv_bare': { clearance: 5.0, label: '>220 kV Bare', description: 'Transmission bare conductor' }
+        };
+
+        function BlowoutCalculator() {
+            // Input state
+            const [conductorType, setConductorType] = React.useState('3w Cu 16 Bare');
+            const [diameter, setDiameter] = React.useState(5.1);
+            const [weight, setWeight] = React.useState(1.77);
+            const [spanLength, setSpanLength] = React.useState(39);
+            const [measuredSag, setMeasuredSag] = React.useState(0.7);
+            const [measurementPosition, setMeasurementPosition] = React.useState(12.25);
+            const [windPressure, setWindPressure] = React.useState(1000);
+            const [horizontalDistance, setHorizontalDistance] = React.useState(3.48);
+            const [heightAboveBuilding, setHeightAboveBuilding] = React.useState(1.1);
+            const [conductorClass, setConductorClass] = React.useState('1to33kv_bare');
+
+            // Handle conductor type selection
+            const handleConductorChange = (typeName) => {
+                setConductorType(typeName);
+                const conductor = CONDUCTOR_TYPES.find(c => c.name === typeName);
+                if (conductor && conductor.name !== 'Custom') {
+                    setDiameter(conductor.diameter);
+                    setWeight(conductor.weight);
+                }
+            };
+
+            // Get current clearance requirement
+            const currentClearance = NZECP34_CLEARANCES[conductorClass];
+            const requiredClearance = currentClearance ? currentClearance.clearance : 1.5;
+
+            // All calculations
+            const calculations = React.useMemo(() => {
+                const d = diameter / 1000;
+                const w = weight;
+                const L = spanLength;
+                const S_measured = measuredSag;
+                const x = measurementPosition;
+                const P = windPressure;
+                const H_dist = horizontalDistance;
+                const H_above = heightAboveBuilding;
+
+                const positionPercent = (x / L) * 100;
+                const S_mid = S_measured * (L * L) / (4 * x * (L - x));
+                const tension = (w * L * L) / (8 * S_mid);
+                const catenaryConstant = tension / w;
+                const blowoutAngleRad = Math.atan((P * d) / w);
+                const blowoutAngleDeg = blowoutAngleRad * (180 / Math.PI);
+
+                const S_building = S_measured;
+                const lateralDisp_building = S_building * Math.sin(blowoutAngleRad);
+                const verticalRise_building = S_building * (1 - Math.cos(blowoutAngleRad));
+                const newHorizDist_building = H_dist - lateralDisp_building;
+                const newHeight_building = H_above + verticalRise_building;
+                const closestApproach_building = Math.min(newHorizDist_building, Math.sqrt(newHorizDist_building * newHorizDist_building + newHeight_building * newHeight_building));
+                
+                const lateralDisp_midspan = S_mid * Math.sin(blowoutAngleRad);
+                const verticalRise_midspan = S_mid * (1 - Math.cos(blowoutAngleRad));
+                const newHorizDist_midspan = H_dist - lateralDisp_midspan;
+                const newHeight_midspan = H_above + verticalRise_midspan;
+                const closestApproach_midspan = Math.min(newHorizDist_midspan, Math.sqrt(newHorizDist_midspan * newHorizDist_midspan + newHeight_midspan * newHeight_midspan));
+
+                const margin_building = newHorizDist_building - requiredClearance;
+                const margin_midspan = newHorizDist_midspan - requiredClearance;
+                const compliant_building = margin_building >= 0;
+                const compliant_midspan = margin_midspan >= 0;
+
+                const windSpeedResults = WIND_SPEEDS.map(ws => {
+                    const angleRad = Math.atan((ws.pressure * d) / w);
+                    const blowout = S_building * Math.sin(angleRad) * 1000;
+                    const clearance = H_dist - (blowout / 1000);
+                    const margin = (clearance - requiredClearance) * 1000;
+                    return {
+                        ...ws,
+                        blowout,
+                        clearance,
+                        margin,
+                        compliant: margin >= 0
+                    };
+                });
+
+                return {
+                    positionPercent,
+                    S_mid,
+                    tension,
+                    catenaryConstant,
+                    blowoutAngleDeg,
+                    S_building,
+                    lateralDisp_building,
+                    lateralDisp_midspan,
+                    verticalRise_building,
+                    verticalRise_midspan,
+                    newHorizDist_building,
+                    newHorizDist_midspan,
+                    newHeight_building,
+                    newHeight_midspan,
+                    closestApproach_building,
+                    closestApproach_midspan,
+                    requiredClearance,
+                    margin_building,
+                    margin_midspan,
+                    compliant_building,
+                    compliant_midspan,
+                    windSpeedResults
+                };
+            }, [diameter, weight, spanLength, measuredSag, measurementPosition, windPressure, horizontalDistance, heightAboveBuilding, requiredClearance]);
+
+            const formatNumber = (num, decimals = 2) => {
+                if (isNaN(num) || !isFinite(num)) return '—';
+                return num.toFixed(decimals);
+            };
+
+            return (
+                <React.Fragment>
+                    {/* Header */}
+                    <header className="header">
+                        <div className="header-inner">
+                            <div>
+                                <h1>NZS 7000 Conductor Blowout Calculator</h1>
+                                <p className="header-subtitle">AS/NZS 7000:2016 Method — Building Position vs Mid-Span Comparison</p>
+                            </div>
+                            <div className="header-brand">
+                                <div className="header-brand-name">kirstymerriman.com</div>
+                                <div className="header-brand-tag">Community Screening Tool</div>
+                            </div>
+                        </div>
+                    </header>
+
+                    <main className="main">
+                        {/* Info Banner */}
+                        <div className="info-banner">
+                            <strong>About this tool:</strong> This calculator helps in-fill property developers screen conductor blowout compliance using the AS/NZS 7000:2016 Appendix Q methodology. It compares blowout at your building position versus the theoretical mid-span worst case, with NZECP34 Table 3 clearance requirements for all voltage levels. <em>This is a screening tool only — always obtain professional engineering verification for consent applications.</em>
+                        </div>
+
+                        <div className="grid-2col">
+                            {/* Section 1: Inputs */}
+                            <section className="section">
+                                <h2 className="section-title blue">Section 1: Your Inputs</h2>
+
+                                <div className="input-group">
+                                    <label className="input-label">Conductor Type</label>
+                                    <select
+                                        className="input-field"
+                                        value={conductorType}
+                                        onChange={(e) => handleConductorChange(e.target.value)}
+                                    >
+                                        {CONDUCTOR_TYPES.map(c => (
+                                            <option key={c.name} value={c.name}>{c.name}</option>
+                                        ))}
+                                    </select>
+                                </div>
+
+                                <div className="input-grid">
+                                    <InputField
+                                        label="Conductor Diameter"
+                                        value={diameter}
+                                        onChange={setDiameter}
+                                        unit="mm"
+                                        hint="e.g., 5.1mm"
+                                        disabled={conductorType !== 'Custom'}
+                                    />
+                                    <InputField
+                                        label="Conductor Weight"
+                                        value={weight}
+                                        onChange={setWeight}
+                                        unit="N/m"
+                                        hint="Weight per metre"
+                                        disabled={conductorType !== 'Custom'}
+                                    />
+                                    <InputField
+                                        label="Span Length (L)"
+                                        value={spanLength}
+                                        onChange={setSpanLength}
+                                        unit="m"
+                                        hint="Distance between poles"
+                                    />
+                                    <InputField
+                                        label="Measured Sag"
+                                        value={measuredSag}
+                                        onChange={setMeasuredSag}
+                                        unit="m"
+                                        hint="At building position, no wind"
+                                        highlight
+                                    />
+                                    <InputField
+                                        label="Position from Pole"
+                                        value={measurementPosition}
+                                        onChange={setMeasurementPosition}
+                                        unit="m"
+                                        hint="Distance to building"
+                                        highlight
+                                    />
+                                    <InputField
+                                        label="Wind Pressure (P)"
+                                        value={windPressure}
+                                        onChange={setWindPressure}
+                                        unit="Pa"
+                                        hint="1000 Pa = 142 km/h"
+                                    />
+                                    <InputField
+                                        label="Horizontal Distance"
+                                        value={horizontalDistance}
+                                        onChange={setHorizontalDistance}
+                                        unit="m"
+                                        hint="Conductor to building face"
+                                        highlight
+                                    />
+                                    <InputField
+                                        label="Height Above Building"
+                                        value={heightAboveBuilding}
+                                        onChange={setHeightAboveBuilding}
+                                        unit="m"
+                                        hint="+ve = above, -ve = below"
+                                    />
+                                </div>
+
+                                {/* NZECP34 Classification */}
+                                <div className="subsection">
+                                    <h3 className="subsection-title">NZECP34 Conductor Classification</h3>
+                                    <div className="input-group">
+                                        <label className="input-label">Voltage Level &amp; Conductor Type</label>
+                                        <select
+                                            className="input-field"
+                                            value={conductorClass}
+                                            onChange={(e) => setConductorClass(e.target.value)}
+                                        >
+                                            <optgroup label="≤1 kV (Low Voltage)">
+                                                <option value="sub1kv_insulated">Insulated (0.1m clearance)</option>
+                                                <option value="sub1kv_bare_neutral">Bare Neutral (0.9m clearance)</option>
+                                                <option value="sub1kv_bare_active">Bare Active (1.5m clearance)</option>
+                                            </optgroup>
+                                            <optgroup label="1 kV – 33 kV (High Voltage)">
+                                                <option value="1to33kv_insulated_earthed">Insulated with Earthed Screen (0.1m clearance)</option>
+                                                <option value="1to33kv_insulated_unearthed">Insulated without Earthed Screen (1.5m clearance)</option>
+                                                <option value="1to33kv_bare">Bare or Covered (2.1m clearance)</option>
+                                            </optgroup>
+                                            <optgroup label="33 kV – 110 kV (Extra High Voltage)">
+                                                <option value="33to110kv_bare">Bare (3.0m clearance)</option>
+                                            </optgroup>
+                                            <optgroup label="110 kV – 220 kV">
+                                                <option value="110to220kv_bare">Bare (4.5m clearance)</option>
+                                            </optgroup>
+                                            <optgroup label=">220 kV (Transmission)">
+                                                <option value="above220kv_bare">Bare (5.0m clearance)</option>
+                                            </optgroup>
+                                        </select>
+                                        <span className="input-hint">
+                                            NZECP34 Table 3, Column C — Distance in any direction from accessible parts
+                                        </span>
+                                    </div>
+                                </div>
+                            </section>
+
+                            {/* Section 2: Calculated Values */}
+                            <section className="section">
+                                <h2 className="section-title green">Section 2: Calculated Values</h2>
+
+                                <div className="result-list">
+                                    <ResultRow label="Position as % of span" value={formatNumber(calculations.positionPercent, 1)} unit="%" note="50% = mid-span" />
+                                    <ResultRow label="Calculated Mid-Span Sag" value={formatNumber(calculations.S_mid, 3)} unit="m" note="S_mid = S(x) × L² / (4 × x × (L−x))" />
+                                    <ResultRow label="Implied Line Tension" value={formatNumber(calculations.tension, 1)} unit="N" note="T = (w × L²) / (8 × S_mid)" />
+                                    <ResultRow label="Catenary Constant (C)" value={formatNumber(calculations.catenaryConstant, 1)} unit="m" note="C = T / w" />
+                                    <ResultRow label="Blowout Angle (φ)" value={formatNumber(calculations.blowoutAngleDeg, 2)} unit="°" note="φ = tan⁻¹(P × d / w)" highlight />
+                                </div>
+                            </section>
+                        </div>
+
+                        {/* Section 3: Blowout Comparison */}
+                        <section className="section section-full">
+                            <h2 className="section-title orange">Section 3: Blowout Comparison</h2>
+                            <p className="section-subtitle">Comparing blowout at your building position vs theoretical mid-span worst case</p>
+
+                            <div className="table-wrapper">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>Parameter</th>
+                                            <th className="col-building">At Building</th>
+                                            <th className="col-midspan">At Mid-Span</th>
+                                            <th className="col-notes">Notes</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <ComparisonRow label="Sag (at-rest)" building={formatNumber(calculations.S_building, 3)} midspan={formatNumber(calculations.S_mid, 3)} unit="m" note="Measured vs calculated" />
+                                        <ComparisonRow label="Lateral Displacement" building={formatNumber(calculations.lateralDisp_building, 3)} midspan={formatNumber(calculations.lateralDisp_midspan, 3)} unit="m" note="d₁ = S × sin(φ)" />
+                                        <ComparisonRow label="Lateral Displacement" building={formatNumber(calculations.lateralDisp_building * 1000, 1)} midspan={formatNumber(calculations.lateralDisp_midspan * 1000, 1)} unit="mm" note="Same in millimetres" />
+                                        <ComparisonRow label="Vertical Rise" building={formatNumber(calculations.verticalRise_building, 3)} midspan={formatNumber(calculations.verticalRise_midspan, 3)} unit="m" note="d₂ = S × (1 − cos(φ))" />
+                                        <ComparisonRow label="New Horizontal Distance" building={formatNumber(calculations.newHorizDist_building, 3)} midspan={formatNumber(calculations.newHorizDist_midspan, 3)} unit="m" note="Original minus blowout" highlight />
+                                        <ComparisonRow label="New Height Above Building" building={formatNumber(calculations.newHeight_building, 3)} midspan={formatNumber(calculations.newHeight_midspan, 3)} unit="m" note="Original plus rise" />
+                                        <ComparisonRow label="Closest Approach" building={formatNumber(calculations.closestApproach_building, 3)} midspan={formatNumber(calculations.closestApproach_midspan, 3)} unit="m" note="Minimum distance to building" highlight />
+                                    </tbody>
+                                </table>
+                            </div>
+                        </section>
+
+                        {/* Section 4: NZECP34 Compliance */}
+                        <section className="section section-full">
+                            <h2 className="section-title red">Section 4: NZECP34 Compliance</h2>
+                            <p className="section-subtitle">Based on NZECP34:2001 Table 3 — Minimum Safe Distances with Specific Engineering Calculation</p>
+
+                            <div className="table-wrapper">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>Parameter</th>
+                                            <th className="col-building">At Building</th>
+                                            <th className="col-midspan">At Mid-Span</th>
+                                            <th className="col-notes">Notes</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>Conductor Classification</td>
+                                            <td className="col-building" colSpan={2} style={{textAlign: 'center'}}>
+                                                {currentClearance ? currentClearance.label : 'Unknown'}
+                                            </td>
+                                            <td className="col-notes">{currentClearance ? currentClearance.description : ''}</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Required Clearance (Table 3, Col C)</td>
+                                            <td className="col-building">{formatNumber(requiredClearance, 1)} m</td>
+                                            <td className="col-midspan">{formatNumber(requiredClearance, 1)} m</td>
+                                            <td className="col-notes">In any direction from accessible parts</td>
+                                        </tr>
+                                        <tr className="highlight">
+                                            <td>Achieved Clearance (after blowout)</td>
+                                            <td className="col-building" style={{fontWeight: 600}}>{formatNumber(calculations.newHorizDist_building, 3)} m</td>
+                                            <td className="col-midspan" style={{fontWeight: 600}}>{formatNumber(calculations.newHorizDist_midspan, 3)} m</td>
+                                            <td className="col-notes">New horizontal distance</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Margin</td>
+                                            <td className="col-building" style={{fontWeight: 600, color: calculations.margin_building >= 0 ? '#81c784' : '#e57373'}}>
+                                                {formatNumber(calculations.margin_building, 3)} m
+                                            </td>
+                                            <td className="col-midspan" style={{fontWeight: 600, color: calculations.margin_midspan >= 0 ? '#81c784' : '#e57373'}}>
+                                                {formatNumber(calculations.margin_midspan, 3)} m
+                                            </td>
+                                            <td className="col-notes">Positive = compliant</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Margin</td>
+                                            <td className="col-building">{formatNumber(calculations.margin_building * 1000, 1)} mm</td>
+                                            <td className="col-midspan">{formatNumber(calculations.margin_midspan * 1000, 1)} mm</td>
+                                            <td className="col-notes"></td>
+                                        </tr>
+                                        <tr>
+                                            <td style={{fontWeight: 600}}>Compliance Status</td>
+                                            <td className="col-building">
+                                                <StatusBadge compliant={calculations.compliant_building} />
+                                            </td>
+                                            <td className="col-midspan">
+                                                <StatusBadge compliant={calculations.compliant_midspan} />
+                                            </td>
+                                            <td className="col-notes"></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </section>
+
+                        {/* Section 5: Wind Speed Comparison */}
+                        <section className="section section-full">
+                            <h2 className="section-title purple">Section 5: Results at Different Wind Speeds</h2>
+                            <p className="section-subtitle">All using your {formatNumber(measuredSag, 2)}m sag at building position — Required clearance: {formatNumber(requiredClearance, 1)}m ({currentClearance ? currentClearance.label : ''})</p>
+
+                            <div className="table-wrapper">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>Wind Speed</th>
+                                            <th className="right">Pressure (Pa)</th>
+                                            <th className="right">Blowout (mm)</th>
+                                            <th className="right">Clearance (m)</th>
+                                            <th className="right">Margin (mm)</th>
+                                            <th className="center">Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {calculations.windSpeedResults.map((row, idx) => (
+                                            <tr key={idx}>
+                                                <td>{row.label}</td>
+                                                <td className="right">{row.pressure}</td>
+                                                <td className="right">{formatNumber(row.blowout, 1)}</td>
+                                                <td className="right">{formatNumber(row.clearance, 3)}</td>
+                                                <td className="right" style={{color: row.margin >= 0 ? '#81c784' : '#e57373'}}>{formatNumber(row.margin, 1)}</td>
+                                                <td className="center">
+                                                    <span className={`status-icon ${row.compliant ? 'pass' : 'fail'}`}>
+                                                        {row.compliant ? '✓' : '✗'}
+                                                    </span>
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </section>
+
+                        {/* Section 6: NZECP34 Reference Table */}
+                        <section className="section section-full">
+                            <h2 className="section-title grey">Section 6: NZECP34 Table 3 Reference — Required Clearances</h2>
+                            <p className="section-subtitle">Column C: In any direction (other than vertically above) from normally accessible parts</p>
+
+                            <div className="table-wrapper">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>Voltage Level</th>
+                                            <th>Conductor Type</th>
+                                            <th className="right">Required Clearance (m)</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr style={{background: conductorClass.startsWith('sub1kv') ? 'rgba(100, 181, 246, 0.1)' : 'transparent'}}>
+                                            <td rowSpan={3}>≤1 kV (Low Voltage)</td>
+                                            <td>Insulated</td>
+                                            <td className="right">0.1</td>
+                                        </tr>
+                                        <tr style={{background: conductorClass.startsWith('sub1kv') ? 'rgba(100, 181, 246, 0.1)' : 'transparent'}}>
+                                            <td>Bare Neutral</td>
+                                            <td className="right">0.9</td>
+                                        </tr>
+                                        <tr style={{background: conductorClass.startsWith('sub1kv') ? 'rgba(100, 181, 246, 0.1)' : 'transparent'}}>
+                                            <td>Bare Active</td>
+                                            <td className="right">1.5</td>
+                                        </tr>
+                                        <tr style={{background: conductorClass.startsWith('1to33kv') ? 'rgba(100, 181, 246, 0.1)' : 'transparent'}}>
+                                            <td rowSpan={3}>1 kV – 33 kV (High Voltage)</td>
+                                            <td>Insulated with Earthed Screen</td>
+                                            <td className="right">0.1</td>
+                                        </tr>
+                                        <tr style={{background: conductorClass.startsWith('1to33kv') ? 'rgba(100, 181, 246, 0.1)' : 'transparent'}}>
+                                            <td>Insulated without Earthed Screen</td>
+                                            <td className="right">1.5</td>
+                                        </tr>
+                                        <tr style={{background: conductorClass.startsWith('1to33kv') ? 'rgba(100, 181, 246, 0.1)' : 'transparent'}}>
+                                            <td>Bare or Covered</td>
+                                            <td className="right">2.1</td>
+                                        </tr>
+                                        <tr style={{background: conductorClass === '33to110kv_bare' ? 'rgba(100, 181, 246, 0.1)' : 'transparent'}}>
+                                            <td>33 kV – 110 kV</td>
+                                            <td>Bare</td>
+                                            <td className="right">3.0</td>
+                                        </tr>
+                                        <tr style={{background: conductorClass === '110to220kv_bare' ? 'rgba(100, 181, 246, 0.1)' : 'transparent'}}>
+                                            <td>110 kV – 220 kV</td>
+                                            <td>Bare</td>
+                                            <td className="right">4.5</td>
+                                        </tr>
+                                        <tr style={{background: conductorClass === 'above220kv_bare' ? 'rgba(100, 181, 246, 0.1)' : 'transparent'}}>
+                                            <td>&gt;220 kV</td>
+                                            <td>Bare</td>
+                                            <td className="right">5.0</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <p className="table-help">Source: NZECP34:2001 Table 3 — Minimum Safe Distances of Conductors from Buildings and Other Structures Where Specific Calculation of Conductor Movement Has Been Carried Out</p>
+                        </section>
+
+                        {/* Section 7: Reference Conductors */}
+                        <section className="section section-full">
+                            <h2 className="section-title grey">Section 7: Reference — Common Conductors</h2>
+
+                            <div className="table-wrapper">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>Conductor Type</th>
+                                            <th className="right">Diameter (mm)</th>
+                                            <th className="right">Weight (N/m)</th>
+                                            <th>Typical Use</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {CONDUCTOR_TYPES.filter(c => c.name !== 'Custom').map((conductor, idx) => (
+                                            <tr 
+                                                key={idx} 
+                                                className={`clickable ${conductorType === conductor.name ? 'selected' : ''}`}
+                                                onClick={() => handleConductorChange(conductor.name)}
+                                            >
+                                                <td>{conductor.name}</td>
+                                                <td className="right">{conductor.diameter}</td>
+                                                <td className="right">{conductor.weight}</td>
+                                                <td style={{color: 'rgba(255,255,255,0.7)'}}>{conductor.use}</td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                            <p className="table-help">Click a row to apply conductor properties</p>
+                        </section>
+
+                        {/* Footer */}
+                        <footer className="footer">
+                            <p>Calculator based on <strong>AS/NZS 7000:2016, Appendix Q3</strong> and <strong>NZECP34:2001 Table 3</strong></p>
+                            <p>
+                                <span className="legend-green">● Green</span> = Results at BUILDING position &nbsp;|&nbsp; 
+                                <span className="legend-blue">● Blue</span> = Results at MID-SPAN (worst case)
+                            </p>
+                            <p className="footer-small" style={{marginTop: '1rem'}}>
+                                © {new Date().getFullYear()} kirstymerriman.com — Community Screening Tool for In-fill Property Developers
+                            </p>
+                            <p className="footer-small footer-muted">
+                                This tool is for preliminary screening only. Always obtain professional engineering verification.
+                            </p>
+                            <p className="footer-small footer-muted" style={{marginTop: '0.5rem'}}>
+                                Open source under MIT Licence — <a href="https://github.com/merrimac54/nzs7000-blowout-calculator" style={{color: 'rgba(255,255,255,0.5)'}}>View on GitHub</a>
+                            </p>
+                        </footer>
+                    </main>
+                </React.Fragment>
+            );
+        }
+
+        // Input Field Component
+        function InputField({ label, value, onChange, unit, hint, disabled, highlight }) {
+            return (
+                <div className="input-group">
+                    <label className="input-label">{label}</label>
+                    <div className="input-wrapper">
+                        <input
+                            type="number"
+                            step="any"
+                            value={value}
+                            onChange={(e) => onChange(parseFloat(e.target.value) || 0)}
+                            disabled={disabled}
+                            className={`input-field ${highlight ? 'highlight' : ''}`}
+                        />
+                        <span className="input-unit">{unit}</span>
+                    </div>
+                    {hint && <span className="input-hint">{hint}</span>}
+                </div>
+            );
+        }
+
+        // Result Row Component
+        function ResultRow({ label, value, unit, note, highlight }) {
+            return (
+                <div className={`result-row ${highlight ? 'highlight' : ''}`}>
+                    <div>
+                        <span className="result-label">{label}</span>
+                        {note && <span className="result-note">{note}</span>}
+                    </div>
+                    <div className="result-value">
+                        <span>{value}</span>
+                        <span className="result-value-unit">{unit}</span>
+                    </div>
+                </div>
+            );
+        }
+
+        // Comparison Row Component
+        function ComparisonRow({ label, building, midspan, unit, note, highlight }) {
+            return (
+                <tr className={highlight ? 'highlight' : ''}>
+                    <td>{label}</td>
+                    <td className="col-building">{building} {unit}</td>
+                    <td className="col-midspan">{midspan} {unit}</td>
+                    <td className="col-notes">{note}</td>
+                </tr>
+            );
+        }
+
+        // Status Badge Component
+        function StatusBadge({ compliant }) {
+            return (
+                <span className={`status-badge ${compliant ? 'compliant' : 'non-compliant'}`}>
+                    {compliant ? '✓ COMPLIANT' : '✗ NON-COMPLIANT'}
+                </span>
+            );
+        }
+
+        // Render the app
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<BlowoutCalculator />);
+    </script>
+</body>
+</html>
